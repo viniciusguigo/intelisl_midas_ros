@@ -79,7 +79,7 @@ class MiDaSROS:
 
 
 if __name__ == '__main__':
-    rospy.init_node('rgb2depth', anonymous=True)
+    rospy.init_node('midas_rgb2depth', anonymous=True)
     MiDaSROS()
     try:
         rospy.spin()

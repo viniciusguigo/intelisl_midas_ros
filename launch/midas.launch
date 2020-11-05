@@ -1,0 +1,3 @@
+<launch>
+    <node pkg='intelisl_midas_ros' type='midas.py' name='midas_rgb2depth' output='screen'></node>
+</launch>
