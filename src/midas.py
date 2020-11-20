@@ -18,16 +18,18 @@ class MiDaSROS:
         # topic where we publish
         self.bridge = CvBridge()
         self.image_pub = rospy.Publisher("/midas/depth/image_raw", Image, queue_size=1)
+        self.image_rgb_pub = rospy.Publisher("/midas/rgb/image_raw", Image, queue_size=1)
 
         # subscribed Topic
-        self.subscriber = rospy.Subscriber("/usb_cam/image_raw",
-            Image, self.callback, queue_size=1)
+        # self.subscriber = rospy.Subscriber("/crazyflie_camera_fpv", Image, self.callback, queue_size=1)
+        # self.subscriber = rospy.Subscriber("/parrot_anafi_fpv", Image, self.callback, queue_size=1)
+        self.subscriber = rospy.Subscriber("/usb_cam/image_raw", Image, self.callback, queue_size=1)
 
         # initialize Intel MiDas
         self.initialized_midas = False
         rospack = rospkg.RosPack()
         ros_pkg_path = rospack.get_path('intelisl_midas_ros')
-        model_path = os.path.join(ros_pkg_path, 'src/model-f46da743.pt')
+        model_path = os.path.join(ros_pkg_path, 'src/model-f6b98070.pt')
 
         self.model = MidasNet(model_path, non_negative=True)
         self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -69,13 +71,14 @@ class MiDaSROS:
             output = prediction.cpu().numpy()
             self.show_image(output, window_name='Estimated Depth')
 
-            # setup message
+            # setup message (depth)
             msg = Image()
             msg.header.stamp = rospy.Time.now()
             msg.data = output
 
             # publish
             self.image_pub.publish(msg)
+            self.image_rgb_pub.publish(img_msg)
 
 
 if __name__ == '__main__':
