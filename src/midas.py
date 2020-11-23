@@ -50,7 +50,7 @@ class MiDaSROS:
         # conversion to OpenCV and the correct color
         img = cv2.cvtColor(
             self.bridge.imgmsg_to_cv2(img_msg, desired_encoding='passthrough'), cv2.COLOR_BGR2RGB)
-        self.show_image(img, window_name='Ground Truth RGB')
+        # self.show_image(img, window_name='Ground Truth RGB')
 
         # convert RGB to depth using MiDaS
         if self.initialized_midas:
@@ -69,7 +69,7 @@ class MiDaSROS:
             prediction = (prediction-omin)/(omax - omin)
 
             output = prediction.cpu().numpy()
-            self.show_image(output, window_name='Estimated Depth')
+            # self.show_image(output, window_name='Estimated Depth')
 
             # setup message (depth)
             msg = Image()
