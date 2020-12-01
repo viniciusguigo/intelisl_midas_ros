@@ -23,8 +23,12 @@ class MiDaSROS:
 
         # subscribed Topic
         # self.subscriber = rospy.Subscriber("/crazyflie_camera_fpv", Image, self.callback, queue_size=1)
-        # self.subscriber = rospy.Subscriber("/parrot_anafi_fpv", Image, self.callback, queue_size=1)
-        self.subscriber = rospy.Subscriber("/usb_cam/image_raw", Image, self.callback, queue_size=1)
+        self.subscriber = rospy.Subscriber("/parrot_anafi_fpv", Image, self.callback, queue_size=1)
+        # self.subscriber = rospy.Subscriber("/usb_cam/image_raw", Image, self.callback, queue_size=1)
+
+        # setup image display
+        self.display_rgb = False
+        self.display_depth = True
 
         # initialize Intel MiDas
         self.initialized_midas = False
@@ -44,6 +48,7 @@ class MiDaSROS:
         self.initialized_midas = True
 
     def show_image(self, img, window_name="Image Window"):
+        cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         cv2.imshow(window_name, img)
         cv2.waitKey(2)
 
@@ -51,7 +56,8 @@ class MiDaSROS:
         # conversion to OpenCV and the correct color
         img = cv2.cvtColor(
             self.bridge.imgmsg_to_cv2(img_msg, desired_encoding='passthrough'), cv2.COLOR_BGR2RGB)
-        # self.show_image(img, window_name='Ground Truth RGB')
+        if self.display_rgb:
+            self.show_image(img, window_name='Ground Truth RGB')
 
         # convert RGB to depth using MiDaS
         if self.initialized_midas:
@@ -70,7 +76,8 @@ class MiDaSROS:
             prediction = (prediction-omin)/(omax - omin)
 
             output = prediction.cpu().numpy()
-            # self.show_image(output, window_name='Estimated Depth')
+            if self.display_depth:
+                self.show_image(output, window_name='Estimated Depth')
 
             # setup message (depth)
             msg = Image()
