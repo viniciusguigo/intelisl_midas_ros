@@ -17,14 +17,14 @@ class MiDaSROS:
         '''Initialize ros publisher, ros subscriber'''
         # topic where we publish
         self.bridge = CvBridge()
-        self.image_pub = rospy.Publisher("/midas/depth/image_raw", Image, queue_size=1)
+        self.image_depth_pub = rospy.Publisher("/midas/depth/image_raw", Image, queue_size=1)
         self.image_rgb_pub = rospy.Publisher("/midas/rgb/image_raw", Image, queue_size=1)
         self.camera_info_pub = rospy.Publisher("/midas/camera_info", CameraInfo, queue_size=1)
 
         # subscribed Topic
         # self.subscriber = rospy.Subscriber("/crazyflie_camera_fpv", Image, self.callback, queue_size=1)
-        self.subscriber = rospy.Subscriber("/parrot_anafi_fpv", Image, self.callback, queue_size=1)
-        # self.subscriber = rospy.Subscriber("/usb_cam/image_raw", Image, self.callback, queue_size=1)
+        # self.subscriber = rospy.Subscriber("/parrot_anafi_fpv", Image, self.callback, queue_size=1)
+        self.subscriber = rospy.Subscriber("/usb_cam/image_raw", Image, self.callback, queue_size=1)
 
         # setup image display
         self.display_rgb = False
@@ -75,23 +75,22 @@ class MiDaSROS:
             omax, omin = prediction.max(), prediction.min()
             prediction = (prediction-omin)/(omax - omin)
 
+            # convert depth prediction to numpy
             output = prediction.cpu().numpy()
             if self.display_depth:
                 self.show_image(output, window_name='Estimated Depth')
 
             # setup message (depth)
-            msg = Image()
-            msg.header.stamp = rospy.Time.now()
-            msg.data = output
+            depth_msg = self.bridge.cv2_to_imgmsg(output, encoding="passthrough")
 
             # setup message camera info
             camera_info_msg = CameraInfo()
-            camera_info_msg.header.stamp = msg.header.stamp
+            camera_info_msg.header.stamp = img_msg.header.stamp
             camera_info_msg.height = img.shape[0]
             camera_info_msg.width = img.shape[1]
 
             # publish
-            self.image_pub.publish(msg)
+            self.image_depth_pub.publish(depth_msg)
             self.image_rgb_pub.publish(img_msg)
             self.camera_info_pub.publish(camera_info_msg)
 
