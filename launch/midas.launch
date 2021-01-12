@@ -1,6 +1,10 @@
 <launch>
+    <!-- RGB Topic -->
+    <arg name="image" default="/midas_rgb/image_raw" />
+
     <!-- Launch Intel MIDAS model -->
-    <node pkg='intelisl_midas_ros' type='midas.py' name='midas_rgb2depth' output='screen' args='$(arg image)'>
+    <node pkg='intelisl_midas_ros' type='midas.py' name='midas_rgb2depth' output='screen'>
+        <remap from="midas_rgb/image_raw"  to="$(arg image)" />
     </node>
         
 </launch>

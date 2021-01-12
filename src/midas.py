@@ -22,7 +22,7 @@ class MiDaSROS:
         self.camera_info_pub = rospy.Publisher("/midas/camera_info", CameraInfo, queue_size=1)
 
         # subscribed Topic
-        self.subscriber = rospy.Subscriber(sys.argv[1], Image, self.callback, queue_size=1)
+        self.subscriber = rospy.Subscriber("/midas_rgb/image_raw", Image, self.callback, queue_size=1)
 
         # setup image display
         self.display_rgb = False
