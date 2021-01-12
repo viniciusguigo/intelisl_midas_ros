@@ -2,7 +2,7 @@
 """
 ROS frontend for Intel-ISL MiDaS adapted from https://github.com/intel-isl/MiDaS
 """
-import os
+import os, sys
 import cv2
 import torch
 import rospy, rospkg
@@ -22,9 +22,7 @@ class MiDaSROS:
         self.camera_info_pub = rospy.Publisher("/midas/camera_info", CameraInfo, queue_size=1)
 
         # subscribed Topic
-        # self.subscriber = rospy.Subscriber("/crazyflie_camera_fpv", Image, self.callback, queue_size=1)
-        # self.subscriber = rospy.Subscriber("/parrot_anafi_fpv", Image, self.callback, queue_size=1)
-        self.subscriber = rospy.Subscriber("/usb_cam/image_raw", Image, self.callback, queue_size=1)
+        self.subscriber = rospy.Subscriber(sys.argv[1], Image, self.callback, queue_size=1)
 
         # setup image display
         self.display_rgb = False
